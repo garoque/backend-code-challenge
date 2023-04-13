@@ -23,6 +23,11 @@ Pronto! Sua aplicação estará disponível rodando localhost na porta `:1323`.
 <br>
 Caso deseje parar o container docker, há disponível o comando `make stop`.
 
+### Como rodar os testes unitários
+
+* `make test` executa os testes unitários e apresenta o percentual de cobertura
+* `make test-cover` executa os testes unitários, salva e apresenta o percentual de cobertura em um arquivo
+
 ## 🎈 Como usar a API
 
 1° Criar dois usuários:<br>
