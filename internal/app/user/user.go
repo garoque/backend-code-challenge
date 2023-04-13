@@ -9,7 +9,7 @@ import (
 )
 
 type AppUserInterface interface {
-	Create(ctx context.Context, user entity.User) error
+	Create(ctx context.Context, user *entity.User) error
 	ReadOneById(ctx context.Context, userId string) (*entity.User, error)
 	ReadAll(ctx context.Context) ([]entity.User, error)
 }
@@ -22,7 +22,7 @@ func NewAppUser(db *database.Container) AppUserInterface {
 	return &appUserImpl{db}
 }
 
-func (u *appUserImpl) Create(ctx context.Context, user entity.User) error {
+func (u *appUserImpl) Create(ctx context.Context, user *entity.User) error {
 	err := u.db.User.Create(ctx, user)
 	if err != nil {
 		log.Println("Error app.user.Create.db.Create: ", err.Error())
