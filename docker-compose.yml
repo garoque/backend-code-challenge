@@ -1,0 +1,12 @@
+version: '3'
+services:
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: snapfi
+      MYSQL_USER: gabriel
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
