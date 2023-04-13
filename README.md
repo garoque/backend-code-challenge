@@ -25,17 +25,17 @@ Caso deseje parar o container docker, há disponível o comando `make stop`.
 1° Criar dois usuários:
     - É necessário criar ao menos dois usuários para simularmos uma transação;
     - Para isso, temos o endpoint `http://localhost:1323/v1/user [POST]`, que aceita no body param um json com o campo `name`. Exemplo:
-    ```json
-    {
-        "name": "Gabriel"
-    }
+    ```javascript
+        {
+            "name": "Gabriel"
+        }
     ```
     - Podemos obter a lista de usuários criados com o endpoint `http://localhost:1323/v1/user [GET]`;
 
 2° Incrementar o saldo de ao menos um dos usuários criados:
     - Para simular uma transação, é necessário que o usuário tenha um saldo disponível;
     - Para isso, temos o endpoint `http://localhost:1323/v1/transaction/increase-balance [PUT]`, que aceita no body param um json com os campos `userId`, que é o ID do usuário que será incrementado o valor e `value`, que é o valor a ser incrementado no saldo. Exemplo:
-    ```json
+    ```javascript
     {
         "userId": "3fe00197-4116-43a1-815d-4635acd4f3a2",
         "value": 100.00
@@ -44,7 +44,7 @@ Caso deseje parar o container docker, há disponível o comando `make stop`.
 
 3° Realizar uma transação entre dois usuários:
     - Para realizarmos uma transação, temos o endpoint `http://localhost:1323/v1/transaction [POST]`, que aceita no body param um json com os campos `sourceUserId`, que é o ID do usuário que está realizando a transação, ou seja, de onde será debitado o valor, o outro campo é o `destinationUserId`, que é o ID do usuário que irá receber o valor e o campo `amount`, que é a quantia transacionada. Exemplo:
-    ```json
+    ```javascript
     {
         "sourceUserId": "3fe00197-4116-43a1-815d-4635acd4f3a2",
         "destinationUserId": "b2eb6dc7-1fcd-444a-a973-74d022eb848b",
