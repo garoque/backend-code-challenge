@@ -21,3 +21,9 @@ mig-up:
 
 mig-down:
 	goose -dir ./internal/migrations mysql $(DB_CONNECTION) down
+
+mocks:
+	rm -rf ./internal/mocks
+
+	mockgen -source=./internal/database/user/user.go -destination=./internal/mocks/user.go -package=mocks -mock_names=Database=MockUserDatabase
+	mockgen -source=./internal/database/transaction/transaction.go -destination=./internal/mocks/transaction.go -package=mocks -mock_names=Database=MockTransactionDatabase

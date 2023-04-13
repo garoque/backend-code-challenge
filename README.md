@@ -11,6 +11,7 @@ A Snapfi se propõe a resolver um problema identificado entre os MEI e autônomo
 - 🐳 [Docker](https://docs.docker.com/desktop/)
 - [Golang](https://golang.org/doc/install)
 - [Goose](https://github.com/pressly/goose)
+- [Mock](https://github.com/golang/mock)
 
 ## 🏁 Como rodar
 
@@ -68,3 +69,4 @@ Podemos obter a lista de usuários criados com o endpoint `http://localhost:1323
 - [sqlx](https://pkg.go.dev/github.com/jmoiron/sqlx) - Pacote para implementar o banco de dados
 - [Echo](https://echo.labstack.com/) - HTTP Framework
 - [Goose](https://github.com/pressly/goose) - Ferramenta utilizada nas migrations do banco de dados
+- [Mock](https://github.com/golang/mock) - Ferramente utilizada na geração dos mocks utilizados nos testes
