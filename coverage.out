@@ -1,4 +1,25 @@
 mode: set
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:25.75,27.2 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:29.86,40.16 4 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:46.2,47.16 2 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:52.2,52.12 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:40.16,44.3 3 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:47.16,50.3 2 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:55.76,60.16 4 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:66.2,67.16 2 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:72.2,72.12 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:60.16,64.3 3 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:67.16,70.3 2 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:75.84,82.16 5 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:88.2,89.16 2 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:94.2,94.21 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:82.16,86.3 3 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:89.16,92.3 2 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:97.94,102.16 4 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:108.2,109.16 2 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:114.2,114.12 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:102.16,106.3 3 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/transaction/transaction.go:109.16,112.3 2 1
 github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:24.61,26.2 1 1
 github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:28.70,33.16 4 1
 github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:39.2,40.16 2 1

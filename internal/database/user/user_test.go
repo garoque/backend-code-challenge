@@ -20,12 +20,12 @@ func TestCreate(t *testing.T) {
 	user := entity.NewUser(dto.CreateUser{Name: "Gabriel"})
 
 	cases := map[string]struct {
-		Input       entity.User
+		InputUser   entity.User
 		ExpectedErr error
 		PrepareMock func(mock sqlmock.Sqlmock)
 	}{
 		"deve retornar sucesso": {
-			Input:       *user,
+			InputUser:   *user,
 			ExpectedErr: nil,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
@@ -36,7 +36,7 @@ func TestCreate(t *testing.T) {
 			},
 		},
 		"deve retornar erro: ao criar user": {
-			Input:       *user,
+			InputUser:   *user,
 			ExpectedErr: custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
@@ -47,7 +47,7 @@ func TestCreate(t *testing.T) {
 			},
 		},
 		"deve retornar erro: ao comitar a transaction": {
-			Input:       *user,
+			InputUser:   *user,
 			ExpectedErr: custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
@@ -68,7 +68,7 @@ func TestCreate(t *testing.T) {
 			db := NewDatabaseUser(dbConn)
 			ctx := context.Background()
 
-			err := db.Create(ctx, cs.Input)
+			err := db.Create(ctx, cs.InputUser)
 			if diff := cmp.Diff(err, cs.ExpectedErr); diff != "" {
 				t.Error(diff)
 			}
