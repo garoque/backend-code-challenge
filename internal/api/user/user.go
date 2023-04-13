@@ -37,7 +37,7 @@ func (h *handler) create(c echo.Context) error {
 		return echo.ErrBadRequest
 	}
 
-	err := h.app.User.Create(c.Request().Context(), entity.NewUser(request))
+	err := h.app.User.Create(c.Request().Context(), *entity.NewUser(request))
 	if err != nil {
 		return err
 	}

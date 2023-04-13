@@ -12,7 +12,7 @@ import (
 )
 
 type DabataseUserInterface interface {
-	Create(ctx context.Context, user *entity.User) error
+	Create(ctx context.Context, user entity.User) error
 	ReadAll(ctx context.Context) ([]entity.User, error)
 	ReadOneById(ctx context.Context, userId string) (*entity.User, error)
 }
@@ -25,7 +25,7 @@ func NewDatabaseUser(dbConn *sqlx.DB) DabataseUserInterface {
 	return &dbImpl{dbConn}
 }
 
-func (u *dbImpl) Create(ctx context.Context, user *entity.User) error {
+func (u *dbImpl) Create(ctx context.Context, user entity.User) error {
 	tx, _ := u.dbConn.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelDefault})
 	query := "INSERT INTO users (id, name, balance) VALUES (?, ?, ?)"
 
