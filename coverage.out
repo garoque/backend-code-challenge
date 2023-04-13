@@ -1,0 +1,13 @@
+mode: set
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:24.61,26.2 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:28.70,33.16 4 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:39.2,40.16 2 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:45.2,45.12 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:33.16,37.3 3 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:40.16,43.3 2 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:48.70,53.16 4 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:58.2,58.19 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:53.16,56.3 2 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:61.88,66.16 4 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:71.2,71.18 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:66.16,69.3 2 1
