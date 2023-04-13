@@ -3,9 +3,8 @@
 
 ---
 
-<p align="center"> A Snapfi se propõe a resolver um problema identificado entre os MEI e autônomos: A dificuldade de gestão financeira que essas pessoa tem. Para isso, o [desafio](https://github.com/snapfi/backend-code-challenge) foi implementar uma API em Go capaz de simular uma transação.
+A Snapfi se propõe a resolver um problema identificado entre os MEI e autônomos: A dificuldade de gestão financeira que essas pessoa tem. Para isso, o [desafio](https://github.com/snapfi/backend-code-challenge) foi implementar uma API em Go capaz de simular uma transação.
     <br> 
-</p>
 
 ## ⛓️ Dependências
 
