@@ -4,11 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	"net/http"
 
 	"github.com/garoque/backend-code-challenge-snapfi/internal/entity"
-	"github.com/garoque/backend-code-challenge-snapfi/pkg/custom_err"
 	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo/v4"
 )
 
 type DabataseUserInterface interface {
@@ -33,13 +32,13 @@ func (u *dbImpl) Create(ctx context.Context, user entity.User) error {
 	if err != nil {
 		tx.Rollback()
 		log.Println("Error create user: ", err.Error())
-		return custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return echo.ErrInternalServerError
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		log.Println("Error create user tx.Commit: ", err.Error())
-		return custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return echo.ErrInternalServerError
 	}
 
 	return nil
@@ -52,7 +51,7 @@ func (u *dbImpl) ReadAll(ctx context.Context) ([]entity.User, error) {
 	err := u.dbConn.SelectContext(ctx, &users, query)
 	if err != nil {
 		log.Println("Error ReadAll user: ", err.Error())
-		return nil, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return nil, echo.ErrInternalServerError
 	}
 
 	return users, nil
@@ -65,7 +64,7 @@ func (u *dbImpl) ReadOneById(ctx context.Context, userId string) (*entity.User, 
 	err := u.dbConn.GetContext(ctx, user, query, userId)
 	if err != nil {
 		log.Println("Error ReadOneById user: ", err.Error())
-		return nil, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return nil, echo.ErrNotFound
 	}
 
 	return user, nil

@@ -2,16 +2,15 @@ package user
 
 import (
 	"context"
-	"net/http"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/api/dto"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/entity"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/test"
-	"github.com/garoque/backend-code-challenge-snapfi/pkg/custom_err"
 	"github.com/garoque/backend-code-challenge-snapfi/pkg/uuid"
 	"github.com/google/go-cmp/cmp"
+	"github.com/labstack/echo/v4"
 )
 
 func TestCreate(t *testing.T) {
@@ -37,25 +36,25 @@ func TestCreate(t *testing.T) {
 		},
 		"deve retornar erro: ao criar user": {
 			InputUser:   *user,
-			ExpectedErr: custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr: echo.ErrInternalServerError,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
 					WithArgs(user.ID, user.Name, user.Balance).
-					WillReturnError(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					WillReturnError(echo.ErrInternalServerError)
 				mock.ExpectRollback()
 			},
 		},
 		"deve retornar erro: ao comitar a transaction": {
 			InputUser:   *user,
-			ExpectedErr: custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr: echo.ErrInternalServerError,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
 					WithArgs(user.ID, user.Name, user.Balance).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit().
-					WillReturnError(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					WillReturnError(echo.ErrInternalServerError)
 			},
 		},
 	}
@@ -106,10 +105,10 @@ func TestReadAll(t *testing.T) {
 		},
 		"deve retornar erro": {
 			ExpectedResult: nil,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrInternalServerError,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).
-					WillReturnError(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					WillReturnError(echo.ErrInternalServerError)
 			},
 		},
 	}
@@ -164,12 +163,12 @@ func TestReadOneById(t *testing.T) {
 		"deve retornar erro": {
 			InputUserId:    user.ID,
 			ExpectedResult: nil,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrNotFound,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).
 					WithArgs(user.ID).
 					WillReturnError(
-						custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+						echo.ErrNotFound,
 					)
 			},
 		},
