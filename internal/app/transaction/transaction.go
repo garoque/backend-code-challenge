@@ -36,7 +36,7 @@ func (tr *appTransactionImpl) Create(ctx context.Context, transaction *entity.Tr
 		tr.updateStatusTransaction(ctx, transaction, 2)
 
 		log.Println("Error app.Transaction.Create.db.ReadOneById.sourceId: ", err.Error())
-		return nil, err
+		return transaction, err
 	}
 
 	destinationUser, err := tr.db.User.ReadOneById(ctx, transaction.DestinationId)
@@ -44,7 +44,7 @@ func (tr *appTransactionImpl) Create(ctx context.Context, transaction *entity.Tr
 		tr.updateStatusTransaction(ctx, transaction, 2)
 
 		log.Println("Error app.Transaction.Create.db.ReadOneById.destinationId: ", err.Error())
-		return nil, err
+		return transaction, err
 	}
 
 	sourceUser.Mutex = &sync.Mutex{}
@@ -59,7 +59,7 @@ func (tr *appTransactionImpl) Create(ctx context.Context, transaction *entity.Tr
 		tr.updateStatusTransaction(ctx, transaction, 2)
 
 		log.Println("Error app.Transaction.Create sourceUser.Balance < transaction.Amount Insufficient balance")
-		return nil, custom_err.New(http.StatusInternalServerError, "Insufficient balance")
+		return transaction, custom_err.New(http.StatusInternalServerError, "Insufficient balance")
 	}
 
 	sourceUser.Balance -= transaction.Amount
@@ -69,13 +69,14 @@ func (tr *appTransactionImpl) Create(ctx context.Context, transaction *entity.Tr
 		tr.updateStatusTransaction(ctx, transaction, 2)
 
 		log.Println("Error app.Transaction.Create.db.UpdateBalanceUser.sourceUser: ", err.Error())
-		return nil, err
+		return transaction, err
 	}
 
 	destinationUser.Balance += transaction.Amount
 	err = tr.db.Transaction.UpdateBalanceUser(ctx, destinationUser.ID, destinationUser.Balance)
 	if err != nil {
 		tr.revertDestinationBalanceTransaction(ctx, destinationUser, transaction.Amount)
+		tr.revertSourceBalanceTransaction(ctx, sourceUser, transaction.Amount)
 		tr.updateStatusTransaction(ctx, transaction, 2)
 
 		log.Println("Error app.Transaction.Create.db.UpdateBalanceUser.destinationUser: ", err.Error())
@@ -131,23 +132,23 @@ func (tr *appTransactionImpl) IncreaseBalanceUser(ctx context.Context, balance *
 	user.Mutex.Lock()
 	defer user.Mutex.Unlock()
 
-	user.Balance += balance.Value
+	user.Balance += transaction.Amount
 
 	err = tr.db.Transaction.UpdateBalanceUser(ctx, user.ID, user.Balance)
 	if err != nil {
-		tr.updateStatusTransaction(ctx, transaction, 2)
 		tr.revertDestinationBalanceTransaction(ctx, user, balance.Value)
+		tr.updateStatusTransaction(ctx, transaction, 2)
 		log.Println("Error app.Transaction.UpdateBalanceUser.db.UpdateBalanceUser: ", err.Error())
 		return 0, err
 	}
+
+	tr.updateStatusTransaction(ctx, transaction, 1)
 
 	newBalance, err := tr.db.Transaction.ReadBalance(ctx, user.ID)
 	if err != nil {
 		log.Println("Error app.Transaction.IncreaseBalanceUser.db.ReadBalance: ", err.Error())
 		return 0, err
 	}
-
-	tr.updateStatusTransaction(ctx, transaction, 1)
 
 	return newBalance, nil
 }
