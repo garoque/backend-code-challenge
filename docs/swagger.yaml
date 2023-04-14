@@ -34,6 +34,8 @@ definitions:
     properties:
       amount:
         type: number
+      createdAt:
+        type: string
       id:
         type: string
       receiverId:
@@ -70,6 +72,25 @@ info:
   version: "1.0"
 paths:
   /transaction:
+    get:
+      consumes:
+      - application/json
+      description: Read all transactions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Transaction'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Read all transactions
+      tags:
+      - transaction
     post:
       consumes:
       - application/json

@@ -178,3 +178,77 @@ func TestIncreaseBalance(t *testing.T) {
 		})
 	}
 }
+
+func TestReadAll(t *testing.T) {
+	transaction := entity.NewTransaction(dto.CreateTransaction{
+		SourceUserId:      "source-user-id",
+		DestinationUserId: "destination-user-id",
+		Amount:            100.10,
+	})
+	transactions := []entity.Transaction{{
+		ID:            transaction.ID,
+		SourceId:      transaction.SourceId,
+		DestinationId: transaction.DestinationId,
+		Amount:        transaction.Amount,
+	}}
+
+	cases := map[string]struct {
+		ExpectedResult []entity.Transaction
+		ExpectedErr    error
+		PrepareMock    func(mockTransactionApp *mocks.MockAppTransactionInterface)
+	}{
+		"deve retornar sucesso": {
+			ExpectedResult: transactions,
+			ExpectedErr:    nil,
+			PrepareMock: func(mockTransactionApp *mocks.MockAppTransactionInterface) {
+				mockTransactionApp.EXPECT().ReadAll(gomock.Any()).Times(1).Return(transactions, nil)
+			},
+		},
+		"deve retornar erro": {
+			ExpectedResult: nil,
+			ExpectedErr:    echo.ErrInternalServerError,
+			PrepareMock: func(mockTransactionApp *mocks.MockAppTransactionInterface) {
+				mockTransactionApp.EXPECT().ReadAll(gomock.Any()).Times(1).Return(nil, echo.ErrInternalServerError)
+			},
+		},
+	}
+
+	for name, cs := range cases {
+		t.Run(name, func(t *testing.T) {
+			ctrl, ctx := gomock.WithContext(context.Background(), t)
+
+			mockTransactionApp := mocks.NewMockAppTransactionInterface(ctrl)
+			cs.PrepareMock(mockTransactionApp)
+
+			api := handler{
+				app: &app.Container{Transaction: mockTransactionApp},
+			}
+
+			e := echo.New()
+
+			endpoint := "/v1/transaction"
+			req := httptest.NewRequest(http.MethodGet, endpoint, nil).WithContext(ctx)
+			rec := httptest.NewRecorder()
+
+			c := e.NewContext(req, rec)
+			c.SetPath(endpoint)
+
+			err := api.readAll(c)
+			assert.Equal(t, cs.ExpectedErr, err)
+
+			if err == nil {
+				expectedResultJSON, err := json.Marshal(dto.Response{Data: transactions})
+				assert.NoError(t, err)
+
+				var expectedResult dto.Response
+				err = json.Unmarshal(expectedResultJSON, &expectedResult)
+				assert.NoError(t, err)
+
+				var currentResult dto.Response
+				json.NewDecoder(rec.Body).Decode(&currentResult)
+
+				assert.Equal(t, expectedResult, currentResult)
+			}
+		})
+	}
+}

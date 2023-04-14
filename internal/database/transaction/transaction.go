@@ -12,9 +12,10 @@ import (
 
 type DabataseTransactionInterface interface {
 	Create(ctx context.Context, transaction *entity.Transaction) error
-	UpdateState(ctx context.Context, state, id string) error
+	UpdateState(ctx context.Context, state entity.StatesTransaction, id string) error
 	ReadBalance(ctx context.Context, userId string) (float64, error)
 	UpdateBalanceUser(ctx context.Context, userId string, value float64) error
+	ReadAll(ctx context.Context) ([]entity.Transaction, error)
 }
 
 type dbImpl struct {
@@ -34,7 +35,7 @@ func (tr *dbImpl) Create(ctx context.Context, transaction *entity.Transaction) e
 		transaction.SourceId,
 		transaction.DestinationId,
 		transaction.Amount,
-		transaction.State.String(),
+		transaction.State,
 	)
 	if err != nil {
 		tx.Rollback()
@@ -51,7 +52,7 @@ func (tr *dbImpl) Create(ctx context.Context, transaction *entity.Transaction) e
 	return nil
 }
 
-func (tr *dbImpl) UpdateState(ctx context.Context, state, id string) error {
+func (tr *dbImpl) UpdateState(ctx context.Context, state entity.StatesTransaction, id string) error {
 	tx, _ := tr.dbConn.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
 	query := "UPDATE transactions SET state = ? WHERE id = ?"
 
@@ -111,4 +112,17 @@ func (tr *dbImpl) UpdateBalanceUser(ctx context.Context, userId string, value fl
 	}
 
 	return nil
+}
+
+func (tr *dbImpl) ReadAll(ctx context.Context) ([]entity.Transaction, error) {
+	transactions := make([]entity.Transaction, 0)
+	query := "SELECT id, id_source, id_destination, amount, state, created_at FROM transactions ORDER BY created_at DESC"
+
+	err := tr.dbConn.SelectContext(ctx, &transactions, query)
+	if err != nil {
+		log.Println("Error ReadAll transactions: ", err.Error())
+		return nil, echo.ErrInternalServerError
+	}
+
+	return transactions, nil
 }

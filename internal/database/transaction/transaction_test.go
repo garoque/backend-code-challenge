@@ -32,7 +32,7 @@ func TestCreate(t *testing.T) {
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
-					WithArgs(transaction.ID, transaction.SourceId, transaction.DestinationId, transaction.Amount, transaction.State.String()).
+					WithArgs(transaction.ID, transaction.SourceId, transaction.DestinationId, transaction.Amount, transaction.State).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 			},
@@ -43,7 +43,7 @@ func TestCreate(t *testing.T) {
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
-					WithArgs(transaction.ID, transaction.SourceId, transaction.DestinationId, transaction.Amount, transaction.State.String()).
+					WithArgs(transaction.ID, transaction.SourceId, transaction.DestinationId, transaction.Amount, transaction.State).
 					WillReturnError(echo.ErrInternalServerError)
 				mock.ExpectRollback()
 			},
@@ -54,7 +54,7 @@ func TestCreate(t *testing.T) {
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
-					WithArgs(transaction.ID, transaction.SourceId, transaction.DestinationId, transaction.Amount, transaction.State.String()).
+					WithArgs(transaction.ID, transaction.SourceId, transaction.DestinationId, transaction.Amount, transaction.State).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit().
 					WillReturnError(echo.ErrInternalServerError)
@@ -82,37 +82,37 @@ func TestUpdateState(t *testing.T) {
 	query := "UPDATE transactions SET state = ? WHERE id = ?"
 
 	cases := map[string]struct {
-		InputState  string
+		InputState  entity.StatesTransaction
 		InputId     string
 		ExpectedErr error
 		PrepareMock func(mock sqlmock.Sqlmock)
 	}{
 		"deve retornar sucesso": {
-			InputState:  entity.BOOKED.String(),
+			InputState:  entity.BOOKED,
 			InputId:     "transaction-id",
 			ExpectedErr: nil,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
-					WithArgs(entity.BOOKED.String(), "transaction-id").
+					WithArgs(entity.BOOKED, "transaction-id").
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 			},
 		},
 		"deve retornar erro: ao criar transaction": {
-			InputState:  entity.BOOKED.String(),
+			InputState:  entity.BOOKED,
 			InputId:     "transaction-id",
 			ExpectedErr: echo.ErrInternalServerError,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
-					WithArgs(entity.BOOKED.String(), "transaction-id").
+					WithArgs(entity.BOOKED, "transaction-id").
 					WillReturnError(echo.ErrInternalServerError)
 				mock.ExpectRollback()
 			},
 		},
 		"deve retornar erro: ao comitar a transaction": {
-			InputState:  entity.BOOKED.String(),
+			InputState:  entity.BOOKED,
 			InputId:     "transaction-id",
 			ExpectedErr: echo.ErrInternalServerError,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
@@ -273,6 +273,67 @@ func TestUpdateBalanceUser(t *testing.T) {
 			ctx := context.Background()
 
 			err := db.UpdateBalanceUser(ctx, cs.InputUserId, cs.InputValue)
+			if diff := cmp.Diff(err, cs.ExpectedErr); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestReadAll(t *testing.T) {
+	query := "SELECT id, id_source, id_destination, amount, state, created_at FROM transactions ORDER BY created_at DESC"
+
+	transaction := entity.NewTransaction(dto.CreateTransaction{
+		SourceUserId:      "source-user-id",
+		DestinationUserId: "destination-user-id",
+		Amount:            100.10,
+	})
+	transactions := []entity.Transaction{{
+		ID:            transaction.ID,
+		SourceId:      transaction.SourceId,
+		DestinationId: transaction.DestinationId,
+		Amount:        transaction.Amount,
+	}}
+
+	cases := map[string]struct {
+		ExpectedResult []entity.Transaction
+		ExpectedErr    error
+		PrepareMock    func(mock sqlmock.Sqlmock)
+	}{
+		"deve retornar sucesso": {
+			ExpectedResult: transactions,
+			ExpectedErr:    nil,
+			PrepareMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).
+					WillReturnRows(
+						test.NewRows("id", "id_source", "id_destination", "amount", "state", "created_at").
+							AddRow(transaction.ID, transaction.SourceId, transaction.DestinationId, transaction.Amount, transaction.State, nil),
+					)
+			},
+		},
+		"deve retornar erro": {
+			ExpectedResult: nil,
+			ExpectedErr:    echo.ErrInternalServerError,
+			PrepareMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).
+					WillReturnError(echo.ErrInternalServerError)
+			},
+		},
+	}
+
+	for name, cs := range cases {
+		t.Run(name, func(t *testing.T) {
+			dbConn, mock := test.GetDB()
+			cs.PrepareMock(mock)
+
+			db := NewDatabaseTransaction(dbConn)
+			ctx := context.Background()
+
+			transactions, err := db.ReadAll(ctx)
+			if diff := cmp.Diff(transactions, cs.ExpectedResult); diff != "" {
+				t.Error(diff)
+			}
+
 			if diff := cmp.Diff(err, cs.ExpectedErr); diff != "" {
 				t.Error(diff)
 			}

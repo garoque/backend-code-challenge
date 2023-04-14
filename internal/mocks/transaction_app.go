@@ -64,3 +64,18 @@ func (mr *MockAppTransactionInterfaceMockRecorder) IncreaseBalanceUser(ctx, tran
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IncreaseBalanceUser", reflect.TypeOf((*MockAppTransactionInterface)(nil).IncreaseBalanceUser), ctx, transaction)
 }
+
+// ReadAll mocks base method.
+func (m *MockAppTransactionInterface) ReadAll(ctx context.Context) ([]entity.Transaction, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReadAll", ctx)
+	ret0, _ := ret[0].([]entity.Transaction)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ReadAll indicates an expected call of ReadAll.
+func (mr *MockAppTransactionInterfaceMockRecorder) ReadAll(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadAll", reflect.TypeOf((*MockAppTransactionInterface)(nil).ReadAll), ctx)
+}

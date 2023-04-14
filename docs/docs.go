@@ -26,6 +26,34 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/transaction": {
+            "get": {
+                "description": "Read all transactions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transaction"
+                ],
+                "summary": "Read all transactions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Transaction"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
             "post": {
                 "description": "Create transaction",
                 "consumes": [
@@ -273,6 +301,9 @@ const docTemplate = `{
             "properties": {
                 "amount": {
                     "type": "number"
+                },
+                "createdAt": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "string"

@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"time"
+
 	"github.com/garoque/backend-code-challenge-snapfi/internal/api/dto"
 	"github.com/garoque/backend-code-challenge-snapfi/pkg/uuid"
 )
@@ -23,11 +25,12 @@ func (st StatesTransaction) String() string {
 
 type Transaction struct {
 	ID            string            `json:"id"`
-	SourceId      string            `json:"senderId"`
-	DestinationId string            `json:"receiverId"`
+	SourceId      string            `json:"senderId" db:"id_source"`
+	DestinationId string            `json:"receiverId" db:"id_destination"`
 	Amount        float64           `json:"amount"`
-	State         StatesTransaction `json:"-"`
+	State         StatesTransaction `json:"-" db:"state"`
 	StateString   string            `json:"state,omitempty"`
+	CreatedAt     *time.Time        `json:"createdAt" db:"created_at"`
 }
 
 func NewTransaction(tr dto.CreateTransaction) *Transaction {

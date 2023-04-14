@@ -13,6 +13,7 @@ import (
 type AppTransactionInterface interface {
 	Create(ctx context.Context, transaction *entity.Transaction) (*entity.Transaction, error)
 	IncreaseBalanceUser(ctx context.Context, transaction *entity.TransactionIncreaseBalanceUser) (float64, error)
+	ReadAll(ctx context.Context) ([]entity.Transaction, error)
 }
 
 type appTransactionImpl struct {
@@ -90,7 +91,7 @@ func (tr *appTransactionImpl) Create(ctx context.Context, transaction *entity.Tr
 func (tr *appTransactionImpl) updateStatusTransaction(ctx context.Context, transaction *entity.Transaction, state entity.StatesTransaction) {
 	transaction.State = state
 	transaction.StateString = transaction.State.String()
-	tr.db.Transaction.UpdateState(ctx, transaction.StateString, transaction.ID)
+	tr.db.Transaction.UpdateState(ctx, transaction.State, transaction.ID)
 }
 
 func (tr *appTransactionImpl) revertSourceBalanceTransaction(ctx context.Context, user *entity.User, amount float64) {
@@ -150,4 +151,18 @@ func (tr *appTransactionImpl) IncreaseBalanceUser(ctx context.Context, balance *
 	}
 
 	return newBalance, nil
+}
+
+func (tr *appTransactionImpl) ReadAll(ctx context.Context) ([]entity.Transaction, error) {
+	transactions, err := tr.db.Transaction.ReadAll(ctx)
+	if err != nil {
+		log.Println("Error app.transaction.ReadAll.db.ReadAll: ", err.Error())
+		return nil, err
+	}
+
+	for i := range transactions {
+		transactions[i].StateString = transactions[i].State.String()
+	}
+
+	return transactions, nil
 }

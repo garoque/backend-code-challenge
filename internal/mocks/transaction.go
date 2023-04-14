@@ -49,6 +49,21 @@ func (mr *MockDabataseTransactionInterfaceMockRecorder) Create(ctx, transaction 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockDabataseTransactionInterface)(nil).Create), ctx, transaction)
 }
 
+// ReadAll mocks base method.
+func (m *MockDabataseTransactionInterface) ReadAll(ctx context.Context) ([]entity.Transaction, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReadAll", ctx)
+	ret0, _ := ret[0].([]entity.Transaction)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ReadAll indicates an expected call of ReadAll.
+func (mr *MockDabataseTransactionInterfaceMockRecorder) ReadAll(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadAll", reflect.TypeOf((*MockDabataseTransactionInterface)(nil).ReadAll), ctx)
+}
+
 // ReadBalance mocks base method.
 func (m *MockDabataseTransactionInterface) ReadBalance(ctx context.Context, userId string) (float64, error) {
 	m.ctrl.T.Helper()
@@ -79,7 +94,7 @@ func (mr *MockDabataseTransactionInterfaceMockRecorder) UpdateBalanceUser(ctx, u
 }
 
 // UpdateState mocks base method.
-func (m *MockDabataseTransactionInterface) UpdateState(ctx context.Context, state, id string) error {
+func (m *MockDabataseTransactionInterface) UpdateState(ctx context.Context, state entity.StatesTransaction, id string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateState", ctx, state, id)
 	ret0, _ := ret[0].(error)

@@ -99,7 +99,7 @@ func TestCreate(t *testing.T) {
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), destinationUser.ID, destinationUserBalanceUpdated).
 					Times(1).Return(nil)
 
-				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), bookedTransaction.StateString, transaction.ID).Times(1).Return(nil)
+				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), bookedTransaction.State, transaction.ID).Times(1).Return(nil)
 			},
 		},
 		"deve retornar erro: ao registrar transaction": {
@@ -118,7 +118,7 @@ func TestCreate(t *testing.T) {
 				mockTransactionDb.EXPECT().Create(gomock.Any(), transaction).Times(1).Return(nil)
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), transaction.SourceId).Times(1).Return(nil, echo.ErrInternalServerError)
 
-				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED.String(), transaction.ID).Times(1).Return(nil)
+				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED, transaction.ID).Times(1).Return(nil)
 			},
 		},
 		"deve retornar erro: ao ler destination user": {
@@ -130,7 +130,7 @@ func TestCreate(t *testing.T) {
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), transaction.SourceId).Times(1).Return(&sourceUser, nil)
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), transaction.DestinationId).Times(1).Return(nil, echo.ErrInternalServerError)
 
-				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED.String(), transaction.ID).Times(1).Return(nil)
+				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED, transaction.ID).Times(1).Return(nil)
 			},
 		},
 		"deve retornar erro: 'Insufficient balance'": {
@@ -142,7 +142,7 @@ func TestCreate(t *testing.T) {
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), failedTransaction.SourceId).Times(1).Return(&sourceUser, nil)
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), failedTransaction.DestinationId).Times(1).Return(&destinationUser, nil)
 
-				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED.String(), failedTransaction.ID).Times(1).Return(nil)
+				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED, failedTransaction.ID).Times(1).Return(nil)
 			},
 		},
 		"deve retornar erro: ao atualizar saldo source user": {
@@ -160,7 +160,7 @@ func TestCreate(t *testing.T) {
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), sourceUser2.ID, sourceUser2.Balance).
 					Times(1).Return(nil)
 
-				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED.String(), failedTransaction.ID).Times(1).Return(nil)
+				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED, failedTransaction.ID).Times(1).Return(nil)
 			},
 		},
 		"deve retornar erro: ao atualizar saldo destination user": {
@@ -184,7 +184,7 @@ func TestCreate(t *testing.T) {
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), sourceUser2.ID, sourceUser2.Balance).
 					Times(1).Return(nil)
 
-				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED.String(), failedTransaction.ID).Times(1).Return(nil)
+				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED, failedTransaction.ID).Times(1).Return(nil)
 			},
 		},
 	}
@@ -275,7 +275,7 @@ func TestIncreaseBalanceUser(t *testing.T) {
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), destinationUser.ID, balanceUserUpdated).
 					Times(1).Return(nil)
 
-				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), bookedTransaction.StateString, transaction.ID).Times(1).Return(nil)
+				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), bookedTransaction.State, transaction.ID).Times(1).Return(nil)
 				mockTransactionDb.EXPECT().ReadBalance(gomock.Any(), destinationUser.ID).Times(1).Return(balanceUserUpdated, nil)
 			},
 		},
@@ -295,7 +295,7 @@ func TestIncreaseBalanceUser(t *testing.T) {
 				mockTransactionDb.EXPECT().Create(gomock.Any(), transaction).Times(1).Return(nil)
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), balance.UserId).Times(1).Return(nil, echo.ErrInternalServerError)
 
-				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED.String(), transaction.ID).Times(1).Return(nil)
+				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED, transaction.ID).Times(1).Return(nil)
 			},
 		},
 		"deve retornar erro: ao atualizar saldo destination user": {
@@ -312,7 +312,7 @@ func TestIncreaseBalanceUser(t *testing.T) {
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), destinationUser2.ID, destinationUser2.Balance).
 					Times(1).Return(nil)
 
-				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED.String(), transaction.ID).Times(1).Return(nil)
+				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED, transaction.ID).Times(1).Return(nil)
 			},
 		},
 		"deve retornar erro: ao ler o saldo": {
@@ -325,7 +325,7 @@ func TestIncreaseBalanceUser(t *testing.T) {
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), destinationUser3.ID, balanceUserUpdated).
 					Times(1).Return(nil)
 
-				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), bookedTransaction.StateString, transaction.ID).Times(1).Return(nil)
+				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), bookedTransaction.State, transaction.ID).Times(1).Return(nil)
 				mockTransactionDb.EXPECT().ReadBalance(gomock.Any(), destinationUser3.ID).Times(1).Return(0.0, echo.ErrInternalServerError)
 			},
 		},
@@ -343,6 +343,55 @@ func TestIncreaseBalanceUser(t *testing.T) {
 
 			balance, err := app.IncreaseBalanceUser(ctx, cs.InputBalance)
 			if diff := cmp.Diff(balance, cs.ExpectedResult); diff != "" {
+				t.Error(diff)
+			}
+
+			if diff := cmp.Diff(err, cs.ExpectedErr); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestReadAll(t *testing.T) {
+	transaction := entity.NewTransaction(dto.CreateTransaction{
+		SourceUserId:      "source-user-id",
+		DestinationUserId: "destination-user-id",
+		Amount:            100.10,
+	})
+	transactions := []entity.Transaction{{
+		ID:            transaction.ID,
+		SourceId:      transaction.SourceId,
+		DestinationId: transaction.DestinationId,
+		Amount:        transaction.Amount,
+	}}
+
+	cases := map[string]struct {
+		ExpectedResult []entity.Transaction
+		ExpectedErr    error
+		PrepareMock    func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface)
+	}{
+		"deve retornar sucesso": {
+			ExpectedResult: transactions,
+			ExpectedErr:    nil,
+			PrepareMock: func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface) {
+				mockTransactionDb.EXPECT().ReadAll(gomock.Any()).Times(1).Return(transactions, nil)
+			},
+		},
+	}
+
+	for name, cs := range cases {
+		t.Run(name, func(t *testing.T) {
+			ctrl, ctx := gomock.WithContext(context.Background(), t)
+
+			mockTransactionDb := mocks.NewMockDabataseTransactionInterface(ctrl)
+			mockUserDb := mocks.NewMockDabataseUserInterface(ctrl)
+			cs.PrepareMock(mockTransactionDb, mockUserDb)
+
+			app := NewAppTransaction(&database.Container{Transaction: mockTransactionDb, User: mockUserDb})
+
+			transactions, err := app.ReadAll(ctx)
+			if diff := cmp.Diff(transactions, cs.ExpectedResult); diff != "" {
 				t.Error(diff)
 			}
 

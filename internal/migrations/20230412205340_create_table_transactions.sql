@@ -5,7 +5,7 @@ CREATE TABLE snapfi.transactions(
     id_source VARCHAR(36) NOT NULL DEFAULT "",
     id_destination VARCHAR(36) NOT NULL,
     amount DECIMAL(9, 2) NOT NULL,
-    state VARCHAR(10) NOT NULL,
+    state SMALLINT NOT NULL,
     created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP(),
     PRIMARY KEY (id)
 )

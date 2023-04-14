@@ -15,6 +15,7 @@ func Register(router *echo.Group, app *app.Container) {
 
 	router.POST("", h.create)
 	router.PUT("/increase-balance", h.increaseBalance)
+	router.GET("", h.readAll)
 }
 
 type handler struct {
@@ -85,4 +86,22 @@ func (h *handler) increaseBalance(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, dto.Response{Data: balance})
+}
+
+// Read all transactions godoc
+// @Summary Read all transactions
+// @Description Read all transactions
+// @Tags transaction
+// @Accept json
+// @Produce json
+// @Success 200 {array} entity.Transaction
+// @Failure 500 {object} error
+// @Router /transaction [get]
+func (h *handler) readAll(c echo.Context) error {
+	transactions, err := h.app.Transaction.ReadAll(c.Request().Context())
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, dto.Response{Data: transactions})
 }
