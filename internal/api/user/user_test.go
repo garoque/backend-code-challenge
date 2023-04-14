@@ -12,7 +12,6 @@ import (
 	"github.com/garoque/backend-code-challenge-snapfi/internal/app"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/entity"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/mocks"
-	"github.com/garoque/backend-code-challenge-snapfi/pkg/custom_err"
 	"github.com/garoque/backend-code-challenge-snapfi/pkg/validator"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
@@ -34,9 +33,9 @@ func TestCreate(t *testing.T) {
 		},
 		"deve retornar erro": {
 			InputUserDto: dto.CreateUser{Name: "Gabriel"},
-			ExpectedErr:  custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:  echo.ErrInternalServerError,
 			PrepareMock: func(mockUserApp *mocks.MockAppUserInterface) {
-				mockUserApp.EXPECT().Create(gomock.Any(), gomock.Any()).Times(1).Return(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockUserApp.EXPECT().Create(gomock.Any(), gomock.Any()).Times(1).Return(echo.ErrInternalServerError)
 			},
 		},
 	}
@@ -92,9 +91,9 @@ func TestReadOne(t *testing.T) {
 		"deve retornar erro": {
 			InputUserId:    userId,
 			ExpectedResult: nil,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrInternalServerError,
 			PrepareMock: func(mockUserApp *mocks.MockAppUserInterface) {
-				mockUserApp.EXPECT().ReadOneById(gomock.Any(), userId).Times(1).Return(nil, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockUserApp.EXPECT().ReadOneById(gomock.Any(), userId).Times(1).Return(nil, echo.ErrInternalServerError)
 			},
 		},
 		"deve retornar erro: 'The provided ID is empty'": {
@@ -166,9 +165,9 @@ func TestReadAll(t *testing.T) {
 		},
 		"deve retornar erro": {
 			ExpectedResult: nil,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrInternalServerError,
 			PrepareMock: func(mockUserApp *mocks.MockAppUserInterface) {
-				mockUserApp.EXPECT().ReadAll(gomock.Any()).Times(1).Return(nil, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockUserApp.EXPECT().ReadAll(gomock.Any()).Times(1).Return(nil, echo.ErrInternalServerError)
 			},
 		},
 	}

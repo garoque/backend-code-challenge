@@ -12,7 +12,6 @@ import (
 	"github.com/garoque/backend-code-challenge-snapfi/internal/app"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/entity"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/mocks"
-	"github.com/garoque/backend-code-challenge-snapfi/pkg/custom_err"
 	"github.com/garoque/backend-code-challenge-snapfi/pkg/uuid"
 	"github.com/garoque/backend-code-challenge-snapfi/pkg/validator"
 	"github.com/golang/mock/gomock"
@@ -51,9 +50,9 @@ func TestCreate(t *testing.T) {
 		"deve retornar erro": {
 			InputTransaction: request,
 			ExpectedResult:   transaction,
-			ExpectedErr:      custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:      echo.ErrInternalServerError,
 			PrepareMock: func(mockTransactionApp *mocks.MockAppTransactionInterface) {
-				mockTransactionApp.EXPECT().Create(gomock.Any(), gomock.Any()).Times(1).Return(transaction, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockTransactionApp.EXPECT().Create(gomock.Any(), gomock.Any()).Times(1).Return(transaction, echo.ErrInternalServerError)
 			},
 		},
 	}
@@ -128,9 +127,9 @@ func TestIncreaseBalance(t *testing.T) {
 		"deve retornar erro": {
 			InputTransaction: transaction,
 			ExpectedResult:   0,
-			ExpectedErr:      custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:      echo.ErrInternalServerError,
 			PrepareMock: func(mockTransactionApp *mocks.MockAppTransactionInterface) {
-				mockTransactionApp.EXPECT().IncreaseBalanceUser(gomock.Any(), gomock.Any()).Times(1).Return(float64(0), custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockTransactionApp.EXPECT().IncreaseBalanceUser(gomock.Any(), gomock.Any()).Times(1).Return(float64(0), echo.ErrInternalServerError)
 			},
 		},
 	}

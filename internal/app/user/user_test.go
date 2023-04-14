@@ -2,17 +2,16 @@ package user
 
 import (
 	"context"
-	"net/http"
 	"testing"
 
 	"github.com/garoque/backend-code-challenge-snapfi/internal/api/dto"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/database"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/entity"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/mocks"
-	"github.com/garoque/backend-code-challenge-snapfi/pkg/custom_err"
 	"github.com/garoque/backend-code-challenge-snapfi/pkg/uuid"
 	"github.com/golang/mock/gomock"
 	"github.com/google/go-cmp/cmp"
+	"github.com/labstack/echo/v4"
 )
 
 func TestCreate(t *testing.T) {
@@ -32,9 +31,9 @@ func TestCreate(t *testing.T) {
 		},
 		"deve retornar erro": {
 			InputUser:   user,
-			ExpectedErr: custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr: echo.ErrInternalServerError,
 			PrepareMock: func(mockUserDb *mocks.MockDabataseUserInterface) {
-				mockUserDb.EXPECT().Create(gomock.Any(), user).Times(1).Return(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockUserDb.EXPECT().Create(gomock.Any(), user).Times(1).Return(echo.ErrInternalServerError)
 			},
 		},
 	}
@@ -80,9 +79,9 @@ func TestReadOneById(t *testing.T) {
 		"deve retornar erro": {
 			InputUserId:    userId,
 			ExpectedResult: nil,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrInternalServerError,
 			PrepareMock: func(mockUserDb *mocks.MockDabataseUserInterface) {
-				mockUserDb.EXPECT().ReadOneById(gomock.Any(), userId).Times(1).Return(nil, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockUserDb.EXPECT().ReadOneById(gomock.Any(), userId).Times(1).Return(nil, echo.ErrInternalServerError)
 			},
 		},
 	}
@@ -128,9 +127,9 @@ func TestReadAll(t *testing.T) {
 		},
 		"deve retornar erro": {
 			ExpectedResult: nil,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrInternalServerError,
 			PrepareMock: func(mockUserDb *mocks.MockDabataseUserInterface) {
-				mockUserDb.EXPECT().ReadAll(gomock.Any()).Times(1).Return(nil, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockUserDb.EXPECT().ReadAll(gomock.Any()).Times(1).Return(nil, echo.ErrInternalServerError)
 			},
 		},
 	}

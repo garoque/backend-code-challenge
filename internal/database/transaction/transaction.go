@@ -4,11 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	"net/http"
 
 	"github.com/garoque/backend-code-challenge-snapfi/internal/entity"
-	"github.com/garoque/backend-code-challenge-snapfi/pkg/custom_err"
 	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo/v4"
 )
 
 type DabataseTransactionInterface interface {
@@ -40,13 +39,13 @@ func (tr *dbImpl) Create(ctx context.Context, transaction *entity.Transaction) e
 	if err != nil {
 		tx.Rollback()
 		log.Println("Error create transaction: ", err.Error())
-		return custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return echo.ErrInternalServerError
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		log.Println("Error create transaction tx.Commit: ", err.Error())
-		return custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return echo.ErrInternalServerError
 	}
 
 	return nil
@@ -60,13 +59,13 @@ func (tr *dbImpl) UpdateState(ctx context.Context, state, id string) error {
 	if err != nil {
 		tx.Rollback()
 		log.Println("Error create transaction: ", err.Error())
-		return custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return echo.ErrInternalServerError
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		log.Println("Error create transaction tx.Commit: ", err.Error())
-		return custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return echo.ErrInternalServerError
 	}
 
 	return nil
@@ -82,13 +81,13 @@ func (tr *dbImpl) ReadBalance(ctx context.Context, userId string) (float64, erro
 	if err != nil {
 		tx.Rollback()
 		log.Println("Error read balance: ", err.Error())
-		return balance, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return balance, echo.ErrNotFound
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		log.Println("Error read balance tx.Commit: ", err.Error())
-		return balance, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return balance, echo.ErrInternalServerError
 	}
 
 	return balance, nil
@@ -102,13 +101,13 @@ func (tr *dbImpl) UpdateBalanceUser(ctx context.Context, userId string, value fl
 	if err != nil {
 		tx.Rollback()
 		log.Println("Error increase balance: ", err.Error())
-		return custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return echo.ErrNotFound
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		log.Println("Error increase balance tx.Commit: ", err.Error())
-		return custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR)
+		return echo.ErrInternalServerError
 	}
 
 	return nil

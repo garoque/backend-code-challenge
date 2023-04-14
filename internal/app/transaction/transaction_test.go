@@ -2,7 +2,6 @@ package transaction
 
 import (
 	"context"
-	"net/http"
 	"sync"
 	"testing"
 	"time"
@@ -11,9 +10,9 @@ import (
 	"github.com/garoque/backend-code-challenge-snapfi/internal/database"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/entity"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/mocks"
-	"github.com/garoque/backend-code-challenge-snapfi/pkg/custom_err"
 	"github.com/golang/mock/gomock"
 	"github.com/google/go-cmp/cmp"
+	"github.com/labstack/echo/v4"
 )
 
 func TestCreate(t *testing.T) {
@@ -65,11 +64,19 @@ func TestCreate(t *testing.T) {
 		CreatedAt: time.Now(),
 	}
 
+	destinationUser2 := entity.User{
+		ID:        destinationUserId,
+		Name:      "João",
+		Balance:   0,
+		Mutex:     &sync.Mutex{},
+		CreatedAt: time.Now(),
+	}
+
 	sourceUserBalanceUpdated := sourceUser.Balance - transaction.Amount
 	destinationUserBalanceUpdated := destinationUser.Balance + transaction.Amount
 
 	sourceUserFailedTrBalanceUpdated := sourceUser2.Balance - failedTransaction.Amount
-	destinationUserFailedTrBalanceUpdated := destinationUser.Balance + failedTransaction.Amount
+	destinationUserFailedTrBalanceUpdated := destinationUser2.Balance + failedTransaction.Amount
 
 	cases := map[string]struct {
 		InputTransaction *entity.Transaction
@@ -98,18 +105,18 @@ func TestCreate(t *testing.T) {
 		"deve retornar erro: ao registrar transaction": {
 			InputTransaction: transaction,
 			ExpectedResult:   nil,
-			ExpectedErr:      custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:      echo.ErrInternalServerError,
 			PrepareMock: func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface) {
-				mockTransactionDb.EXPECT().Create(gomock.Any(), transaction).Times(1).Return(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockTransactionDb.EXPECT().Create(gomock.Any(), transaction).Times(1).Return(echo.ErrInternalServerError)
 			},
 		},
 		"deve retornar erro: ao ler source user": {
 			InputTransaction: transaction,
 			ExpectedResult:   transaction,
-			ExpectedErr:      custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:      echo.ErrInternalServerError,
 			PrepareMock: func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface) {
 				mockTransactionDb.EXPECT().Create(gomock.Any(), transaction).Times(1).Return(nil)
-				mockUserDb.EXPECT().ReadOneById(gomock.Any(), transaction.SourceId).Times(1).Return(nil, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockUserDb.EXPECT().ReadOneById(gomock.Any(), transaction.SourceId).Times(1).Return(nil, echo.ErrInternalServerError)
 
 				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED.String(), transaction.ID).Times(1).Return(nil)
 			},
@@ -117,11 +124,11 @@ func TestCreate(t *testing.T) {
 		"deve retornar erro: ao ler destination user": {
 			InputTransaction: transaction,
 			ExpectedResult:   transaction,
-			ExpectedErr:      custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:      echo.ErrInternalServerError,
 			PrepareMock: func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface) {
 				mockTransactionDb.EXPECT().Create(gomock.Any(), transaction).Times(1).Return(nil)
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), transaction.SourceId).Times(1).Return(&sourceUser, nil)
-				mockUserDb.EXPECT().ReadOneById(gomock.Any(), transaction.DestinationId).Times(1).Return(nil, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockUserDb.EXPECT().ReadOneById(gomock.Any(), transaction.DestinationId).Times(1).Return(nil, echo.ErrInternalServerError)
 
 				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED.String(), transaction.ID).Times(1).Return(nil)
 			},
@@ -129,7 +136,7 @@ func TestCreate(t *testing.T) {
 		"deve retornar erro: 'Insufficient balance'": {
 			InputTransaction: failedTransaction,
 			ExpectedResult:   failedTransaction,
-			ExpectedErr:      custom_err.New(http.StatusInternalServerError, "Insufficient balance"),
+			ExpectedErr:      echo.NewHTTPError(echo.ErrBadRequest.Code, "Insufficient balance"),
 			PrepareMock: func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface) {
 				mockTransactionDb.EXPECT().Create(gomock.Any(), failedTransaction).Times(1).Return(nil)
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), failedTransaction.SourceId).Times(1).Return(&sourceUser, nil)
@@ -141,14 +148,14 @@ func TestCreate(t *testing.T) {
 		"deve retornar erro: ao atualizar saldo source user": {
 			InputTransaction: failedTransaction,
 			ExpectedResult:   failedTransaction,
-			ExpectedErr:      custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:      echo.ErrInternalServerError,
 			PrepareMock: func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface) {
 				mockTransactionDb.EXPECT().Create(gomock.Any(), failedTransaction).Times(1).Return(nil)
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), failedTransaction.SourceId).Times(1).Return(&sourceUser2, nil)
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), failedTransaction.DestinationId).Times(1).Return(&destinationUser, nil)
 
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), sourceUser2.ID, sourceUserFailedTrBalanceUpdated).
-					Times(1).Return(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					Times(1).Return(echo.ErrInternalServerError)
 
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), sourceUser2.ID, sourceUser2.Balance).
 					Times(1).Return(nil)
@@ -159,19 +166,19 @@ func TestCreate(t *testing.T) {
 		"deve retornar erro: ao atualizar saldo destination user": {
 			InputTransaction: failedTransaction,
 			ExpectedResult:   failedTransaction,
-			ExpectedErr:      custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:      echo.ErrInternalServerError,
 			PrepareMock: func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface) {
 				mockTransactionDb.EXPECT().Create(gomock.Any(), failedTransaction).Times(1).Return(nil)
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), failedTransaction.SourceId).Times(1).Return(&sourceUser2, nil)
-				mockUserDb.EXPECT().ReadOneById(gomock.Any(), failedTransaction.DestinationId).Times(1).Return(&destinationUser, nil)
+				mockUserDb.EXPECT().ReadOneById(gomock.Any(), failedTransaction.DestinationId).Times(1).Return(&destinationUser2, nil)
 
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), sourceUser2.ID, sourceUserFailedTrBalanceUpdated).
 					Times(1).Return(nil)
 
-				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), destinationUser.ID, destinationUserFailedTrBalanceUpdated).
-					Times(1).Return(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), destinationUser2.ID, destinationUserFailedTrBalanceUpdated).
+					Times(1).Return(echo.ErrInternalServerError)
 
-				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), destinationUser.ID, destinationUser.Balance).
+				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), destinationUser2.ID, destinationUser2.Balance).
 					Times(1).Return(nil)
 
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), sourceUser2.ID, sourceUser2.Balance).
@@ -275,18 +282,18 @@ func TestIncreaseBalanceUser(t *testing.T) {
 		"deve retornar erro: ao registrar transaction": {
 			InputBalance:   balance,
 			ExpectedResult: 0,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrInternalServerError,
 			PrepareMock: func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface) {
-				mockTransactionDb.EXPECT().Create(gomock.Any(), transaction).Times(1).Return(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockTransactionDb.EXPECT().Create(gomock.Any(), transaction).Times(1).Return(echo.ErrInternalServerError)
 			},
 		},
 		"deve retornar erro: ao ler destination user": {
 			InputBalance:   balance,
 			ExpectedResult: 0,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrInternalServerError,
 			PrepareMock: func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface) {
 				mockTransactionDb.EXPECT().Create(gomock.Any(), transaction).Times(1).Return(nil)
-				mockUserDb.EXPECT().ReadOneById(gomock.Any(), balance.UserId).Times(1).Return(nil, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockUserDb.EXPECT().ReadOneById(gomock.Any(), balance.UserId).Times(1).Return(nil, echo.ErrInternalServerError)
 
 				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), entity.FAILED.String(), transaction.ID).Times(1).Return(nil)
 			},
@@ -294,13 +301,13 @@ func TestIncreaseBalanceUser(t *testing.T) {
 		"deve retornar erro: ao atualizar saldo destination user": {
 			InputBalance:   balance,
 			ExpectedResult: 0,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrInternalServerError,
 			PrepareMock: func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface) {
 				mockTransactionDb.EXPECT().Create(gomock.Any(), transaction).Times(1).Return(nil)
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), balance.UserId).Times(1).Return(destinationUser2, nil)
 
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), destinationUser2.ID, balanceUser).
-					Times(1).Return(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					Times(1).Return(echo.ErrInternalServerError)
 
 				mockTransactionDb.EXPECT().UpdateBalanceUser(gomock.Any(), destinationUser2.ID, destinationUser2.Balance).
 					Times(1).Return(nil)
@@ -311,7 +318,7 @@ func TestIncreaseBalanceUser(t *testing.T) {
 		"deve retornar erro: ao ler o saldo": {
 			InputBalance:   balance,
 			ExpectedResult: 0,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrInternalServerError,
 			PrepareMock: func(mockTransactionDb *mocks.MockDabataseTransactionInterface, mockUserDb *mocks.MockDabataseUserInterface) {
 				mockTransactionDb.EXPECT().Create(gomock.Any(), transaction).Times(1).Return(nil)
 				mockUserDb.EXPECT().ReadOneById(gomock.Any(), balance.UserId).Times(1).Return(destinationUser3, nil)
@@ -319,7 +326,7 @@ func TestIncreaseBalanceUser(t *testing.T) {
 					Times(1).Return(nil)
 
 				mockTransactionDb.EXPECT().UpdateState(gomock.Any(), bookedTransaction.StateString, transaction.ID).Times(1).Return(nil)
-				mockTransactionDb.EXPECT().ReadBalance(gomock.Any(), destinationUser3.ID).Times(1).Return(0.0, custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+				mockTransactionDb.EXPECT().ReadBalance(gomock.Any(), destinationUser3.ID).Times(1).Return(0.0, echo.ErrInternalServerError)
 			},
 		},
 	}

@@ -2,15 +2,14 @@ package transaction
 
 import (
 	"context"
-	"net/http"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/api/dto"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/entity"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/test"
-	"github.com/garoque/backend-code-challenge-snapfi/pkg/custom_err"
 	"github.com/google/go-cmp/cmp"
+	"github.com/labstack/echo/v4"
 )
 
 func TestCreate(t *testing.T) {
@@ -40,25 +39,25 @@ func TestCreate(t *testing.T) {
 		},
 		"deve retornar erro: ao criar transaction": {
 			InputTransaction: transaction,
-			ExpectedErr:      custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:      echo.ErrInternalServerError,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
 					WithArgs(transaction.ID, transaction.SourceId, transaction.DestinationId, transaction.Amount, transaction.State.String()).
-					WillReturnError(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					WillReturnError(echo.ErrInternalServerError)
 				mock.ExpectRollback()
 			},
 		},
 		"deve retornar erro: ao comitar a transaction": {
 			InputTransaction: transaction,
-			ExpectedErr:      custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:      echo.ErrInternalServerError,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
 					WithArgs(transaction.ID, transaction.SourceId, transaction.DestinationId, transaction.Amount, transaction.State.String()).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit().
-					WillReturnError(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					WillReturnError(echo.ErrInternalServerError)
 			},
 		},
 	}
@@ -103,26 +102,26 @@ func TestUpdateState(t *testing.T) {
 		"deve retornar erro: ao criar transaction": {
 			InputState:  entity.BOOKED.String(),
 			InputId:     "transaction-id",
-			ExpectedErr: custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr: echo.ErrInternalServerError,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
 					WithArgs(entity.BOOKED.String(), "transaction-id").
-					WillReturnError(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					WillReturnError(echo.ErrInternalServerError)
 				mock.ExpectRollback()
 			},
 		},
 		"deve retornar erro: ao comitar a transaction": {
 			InputState:  entity.BOOKED.String(),
 			InputId:     "transaction-id",
-			ExpectedErr: custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr: echo.ErrInternalServerError,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
 					WithArgs(entity.BOOKED.String(), "transaction-id").
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit().
-					WillReturnError(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					WillReturnError(echo.ErrInternalServerError)
 			},
 		},
 	}
@@ -170,26 +169,26 @@ func TestReadBalance(t *testing.T) {
 		"deve retornar erro: ao criar transaction": {
 			InputUserId:    userId,
 			ExpectedResult: balance,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrNotFound,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectQuery(query).
 					WithArgs(userId).
-					WillReturnError(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					WillReturnError(echo.ErrNotFound)
 				mock.ExpectRollback()
 			},
 		},
 		"deve retornar erro: ao comitar a transaction": {
 			InputUserId:    userId,
 			ExpectedResult: balance,
-			ExpectedErr:    custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr:    echo.ErrInternalServerError,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectQuery(query).
 					WithArgs(userId).
 					WillReturnRows(test.NewRows("balance").AddRow(balance))
 				mock.ExpectCommit().
-					WillReturnError(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					WillReturnError(echo.ErrInternalServerError)
 			},
 		},
 	}
@@ -241,26 +240,26 @@ func TestUpdateBalanceUser(t *testing.T) {
 		"deve retornar erro: ao criar transaction": {
 			InputValue:  value,
 			InputUserId: userId,
-			ExpectedErr: custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr: echo.ErrNotFound,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
 					WithArgs(value, userId).
-					WillReturnError(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					WillReturnError(echo.ErrNotFound)
 				mock.ExpectRollback()
 			},
 		},
 		"deve retornar erro: ao comitar a transaction": {
 			InputValue:  value,
 			InputUserId: userId,
-			ExpectedErr: custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR),
+			ExpectedErr: echo.ErrInternalServerError,
 			PrepareMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(query).
 					WithArgs(value, userId).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit().
-					WillReturnError(custom_err.New(http.StatusInternalServerError, custom_err.INTERNAL_ERROR))
+					WillReturnError(echo.ErrInternalServerError)
 			},
 		},
 	}

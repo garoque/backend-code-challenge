@@ -3,12 +3,11 @@ package transaction
 import (
 	"context"
 	"log"
-	"net/http"
 	"sync"
 
 	"github.com/garoque/backend-code-challenge-snapfi/internal/database"
 	"github.com/garoque/backend-code-challenge-snapfi/internal/entity"
-	"github.com/garoque/backend-code-challenge-snapfi/pkg/custom_err"
+	"github.com/labstack/echo/v4"
 )
 
 type AppTransactionInterface interface {
@@ -59,7 +58,7 @@ func (tr *appTransactionImpl) Create(ctx context.Context, transaction *entity.Tr
 		tr.updateStatusTransaction(ctx, transaction, 2)
 
 		log.Println("Error app.Transaction.Create sourceUser.Balance < transaction.Amount Insufficient balance")
-		return transaction, custom_err.New(http.StatusInternalServerError, "Insufficient balance")
+		return transaction, echo.NewHTTPError(echo.ErrBadRequest.Code, "Insufficient balance")
 	}
 
 	sourceUser.Balance -= transaction.Amount
