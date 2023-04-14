@@ -80,3 +80,7 @@ Podemos obter a lista de usuários criados com o endpoint `http://localhost:1323
 - [Goose](https://github.com/pressly/goose) - Ferramenta utilizada nas migrations do banco de dados
 - [Mock](https://github.com/golang/mock) - Ferramenta utilizada na geração dos mocks utilizados nos testes
 - [Swag](https://github.com/swaggo/swag) e [Echo-Swag](https://github.com/swaggo/echo-swagger) - Ferramenta utilizada para acessar documentação
+
+## Vídeo rodando o projeto
+
+https://drive.google.com/file/d/1WuVEqm-OZNtw3mcicUx_TUJc2ZYKM4z4/view?usp=sharing
