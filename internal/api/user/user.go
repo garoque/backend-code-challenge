@@ -10,11 +10,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var (
-	ERROR_BAD_REQUEST = echo.NewHTTPError(http.StatusBadRequest, "Invalid request")
-	ERROR_INTERNAL    = echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
-)
-
 func Register(router *echo.Group, app *app.Container) {
 	h := &handler{app}
 
