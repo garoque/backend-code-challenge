@@ -30,7 +30,7 @@ Caso deseje parar o container docker, há disponível o comando `make stop`.
 * `make test-cover` executa os testes unitários, salva e apresenta o percentual de cobertura em um arquivo
 <br>
 Percentual de cobertura atual
-<img src="pkg/assets/coverage_test.png" align="center" width="150" alt="Coverage tests"/>
+<img src="pkg/assets/coverage_test.png" align="center" width="250" alt="Coverage tests"/>
 
 ## 🎈 Como usar a API
 
