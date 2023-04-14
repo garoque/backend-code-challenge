@@ -21,6 +21,17 @@ type handler struct {
 	app *app.Container
 }
 
+// Create transaction godoc
+// @Summary Create transaction
+// @Description Create transaction
+// @Tags transaction
+// @Accept json
+// @Produce json
+// @Param request body dto.CreateTransaction true "transaction request"
+// @Success 201 {object} entity.Transaction
+// @Failure 400 {object} error
+// @Failure 500 {object} error
+// @Router /transaction [post]
 func (h *handler) create(c echo.Context) error {
 	var transaction dto.CreateTransaction
 	if err := c.Bind(&transaction); err != nil {
@@ -40,9 +51,20 @@ func (h *handler) create(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, dto.Response{Data: balance})
+	return c.JSON(http.StatusCreated, dto.Response{Data: balance})
 }
 
+// Increase balance user godoc
+// @Summary Increase balance user
+// @Description Increase balance user
+// @Tags transaction
+// @Accept json
+// @Produce json
+// @Param request body dto.IncreaseBalanceUser true "increase balance request"
+// @Success 200 {object} float64
+// @Failure 400 {object} error
+// @Failure 500 {object} error
+// @Router /transaction/increase-balance [put]
 func (h *handler) increaseBalance(c echo.Context) error {
 	var transaction dto.IncreaseBalanceUser
 	if err := c.Bind(&transaction); err != nil {

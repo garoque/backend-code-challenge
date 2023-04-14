@@ -12,6 +12,7 @@ A Snapfi se propõe a resolver um problema identificado entre os MEI e autônomo
 - [Golang](https://golang.org/doc/install)
 - [Goose](https://github.com/pressly/goose)
 - [Mock](https://github.com/golang/mock)
+- [Swag](https://github.com/swaggo/swag)
 
 ## 🏁 Como rodar
 
@@ -31,6 +32,11 @@ Caso deseje parar o container docker, há disponível o comando `make stop`.
 <br>
 Percentual de cobertura atual
 <img src="pkg/assets/coverage_test.png" align="center" width="250" alt="Coverage tests"/>
+
+### Como acessar o swag
+
+* Após rodar o projeto, a documentação do swagger está disponível no [endpoint](http://localhost:1323/v1/swagger/index.html)
+
 
 ## 🎈 Como usar a API
 
@@ -72,4 +78,5 @@ Podemos obter a lista de usuários criados com o endpoint `http://localhost:1323
 - [sqlx](https://pkg.go.dev/github.com/jmoiron/sqlx) - Pacote para implementar o banco de dados
 - [Echo](https://echo.labstack.com/) - HTTP Framework
 - [Goose](https://github.com/pressly/goose) - Ferramenta utilizada nas migrations do banco de dados
-- [Mock](https://github.com/golang/mock) - Ferramente utilizada na geração dos mocks utilizados nos testes
+- [Mock](https://github.com/golang/mock) - Ferramenta utilizada na geração dos mocks utilizados nos testes
+- [Swag](https://github.com/swaggo/swag) e [Echo-Swag](https://github.com/swaggo/echo-swagger) - Ferramenta utilizada para acessar documentação
