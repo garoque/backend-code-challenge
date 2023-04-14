@@ -105,3 +105,7 @@ github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:
 github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:61.88,66.16 4 1
 github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:71.2,71.18 1 1
 github.com/garoque/backend-code-challenge-snapfi/internal/database/user/user.go:66.16,69.3 2 1
+github.com/garoque/backend-code-challenge-snapfi/internal/entity/transaction.go:20.45,22.2 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/entity/transaction.go:33.60,40.2 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/entity/transaction.go:48.89,54.2 1 1
+github.com/garoque/backend-code-challenge-snapfi/internal/entity/user.go:20.41,26.2 1 1
