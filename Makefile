@@ -27,3 +27,6 @@ mocks:
 
 	mockgen -source=./internal/database/user/user.go -destination=./internal/mocks/user.go -package=mocks -mock_names=Database=MockUserDatabase
 	mockgen -source=./internal/database/transaction/transaction.go -destination=./internal/mocks/transaction.go -package=mocks -mock_names=Database=MockTransactionDatabase
+
+	mockgen -source=./internal/app/user/user.go -destination=./internal/mocks/user_app.go -package=mocks -mock_names=App=MockUserApp
+	mockgen -source=./internal/app/transaction/transaction.go -destination=./internal/mocks/transaction_app.go -package=mocks -mock_names=App=MockTransactionApp
