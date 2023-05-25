@@ -1,4 +1,4 @@
-<img src="pkg/assets/XXX.png" align="right" height="178" alt="Snapfi"/>
+<img src="pkg/assets/XXX.png" align="right" height="178" alt="XXX"/>
 <h3>Backend Code Challenge</h3>
 
 ---
