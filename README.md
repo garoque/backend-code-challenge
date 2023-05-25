@@ -1,9 +1,9 @@
-<img src="pkg/assets/snapfi.png" align="right" height="178" alt="Snapfi"/>
-<h3>Snapfi Backend Code Challenge</h3>
+<img src="pkg/assets/XXX.png" align="right" height="178" alt="Snapfi"/>
+<h3>Backend Code Challenge</h3>
 
 ---
 
-A Snapfi se propõe a resolver um problema identificado entre os MEI e autônomos: A dificuldade de gestão financeira que essas pessoa tem. Para isso, o [desafio](https://github.com/snapfi/backend-code-challenge) foi implementar uma API em Go capaz de simular uma transação.
+A XXX se propõe a resolver um problema identificado entre os MEI e autônomos: A dificuldade de gestão financeira que essas pessoa tem. Para isso, o desafio foi implementar uma API em Go capaz de simular uma transação.
     <br> 
 
 ## ⛓️ Dependências
